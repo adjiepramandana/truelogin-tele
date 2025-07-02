@@ -1195,6 +1195,39 @@ app.post('/setId', (req, res) => {
     res.json({ status: 'success', message: 'Id owner telah disimpan!', userIdOwner });
   });
 
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
+// === Self-ping every 5 minutes ===
+setInterval(() => {
+  axios.get(`${API_BASE_URL}ping`).then(() => {
+    console.log("📡 Self ping berhasil");
+  }).catch(err => {
+    console.error("📡 Self ping error:", err.message);
+  });
+}, 300000); // 5 menit
+
+function restartApp() {
+  console.log('🔁 Restarting app...');
+  require('child_process').spawn(process.argv[0], process.argv.slice(1), {
+    stdio: 'inherit'
+  });
+  process.exit(1);
+}
+
+
+// === Global error handling and restart ===
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+  restartApp();
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  restartApp();
+});
+
 // Start server
 app.listen(port, () => {
   figlet.text('Truelogin-V3', { font: 'Slant' }, (err, data) => {
